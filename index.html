@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Platform Fee Estimator — Shopify Commerce</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green: #008060;
+      --green-light: #e3f1ec;
+      --green-dark: #004c3f;
+      --blue: #0070d1;
+      --blue-light: #e8f1fb;
+      --orange: #b5500a;
+      --orange-light: #fdf0e8;
+      --grey-50: #f4f6f8;
+      --grey-100: #e4e5e7;
+      --grey-200: #c9cccf;
+      --grey-500: #8c9196;
+      --grey-700: #3a3c3e;
+      --grey-900: #1a1a1b;
+      --white: #ffffff;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.07), 0 2px 8px rgba(0,0,0,.04);
+      --shadow: 0 2px 6px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.05);
+      --radius: 10px;
+      --radius-sm: 6px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      background: var(--grey-50);
+      color: var(--grey-900);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Nav ─────────────────────────────────────────── */
+    .site-nav {
+      background: var(--green-dark);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      height: 56px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .nav-logo-mark {
+      width: 28px;
+      height: 28px;
+      background: var(--green);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .nav-logo-mark svg { width: 18px; height: 18px; fill: white; }
+
+    .nav-logo-text {
+      font-size: 17px;
+      font-weight: 700;
+      color: white;
+      letter-spacing: -.01em;
+    }
+
+    .nav-divider {
+      width: 1px;
+      height: 20px;
+      background: rgba(255,255,255,.25);
+      margin: 0 12px;
+    }
+
+    .nav-subtitle {
+      font-size: 13px;
+      color: rgba(255,255,255,.65);
+      font-weight: 400;
+    }
+
+    /* ── Hero ─────────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, var(--green-dark) 0%, #006b4f 100%);
+      padding: 56px 24px 52px;
+      text-align: center;
+    }
+
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.6);
+      margin-bottom: 14px;
+    }
+
+    .hero h1 {
+      font-size: clamp(28px, 5vw, 42px);
+      font-weight: 800;
+      color: white;
+      letter-spacing: -.02em;
+      line-height: 1.15;
+      max-width: 640px;
+      margin: 0 auto 16px;
+    }
+
+    .hero p {
+      font-size: 17px;
+      color: rgba(255,255,255,.75);
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* ── Page wrap ─────────────────────────────────────── */
+    .page-wrap {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 36px 20px 60px;
+    }
+
+    /* ── Section label ─────────────────────────────────── */
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--grey-500);
+      margin-bottom: 12px;
+    }
+
+    /* ── Cards ─────────────────────────────────────────── */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--grey-100);
+      padding: 28px;
+    }
+
+    .card-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--grey-900);
+      margin-bottom: 4px;
+    }
+
+    .card-desc {
+      font-size: 13px;
+      color: var(--grey-500);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    /* ── 2-col layout ──────────────────────────────────── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    @media (max-width: 720px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* ── Toggle ─────────────────────────────────────────── */
+    .period-toggle {
+      display: inline-flex;
+      background: var(--grey-50);
+      border: 1px solid var(--grey-100);
+      border-radius: 8px;
+      padding: 3px;
+      margin-bottom: 24px;
+    }
+
+    .period-toggle button {
+      padding: 7px 18px;
+      font-size: 13px;
+      font-weight: 500;
+      border: none;
+      background: transparent;
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--grey-500);
+      transition: all .15s;
+    }
+
+    .period-toggle button.active {
+      background: var(--white);
+      color: var(--green-dark);
+      font-weight: 600;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* ── Channel blocks ─────────────────────────────────── */
+    .channel-block {
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .channel-block.dtc {
+      background: var(--blue-light);
+      border: 1px solid #c4d9f5;
+    }
+
+    .channel-block.b2b {
+      background: var(--orange-light);
+      border: 1px solid #f5cfb0;
+    }
+
+    .channel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .channel-name-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .channel-badge {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .06em;
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .dtc .channel-badge { background: var(--blue); color: white; }
+    .b2b .channel-badge { background: var(--orange); color: white; }
+
+    .channel-name { font-size: 13px; font-weight: 600; color: var(--grey-700); }
+
+    .rate-chip {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: rgba(255,255,255,.7);
+      color: var(--grey-700);
+      border: 1px solid rgba(0,0,0,.07);
+    }
+
+    /* ── Inputs ─────────────────────────────────────────── */
+    .input-group { margin-bottom: 0; }
+
+    .input-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--grey-700);
+      margin-bottom: 6px;
+    }
+
+    .input-wrap {
+      display: flex;
+      align-items: center;
+      border: 1.5px solid var(--grey-200);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      background: var(--white);
+      transition: border-color .15s, box-shadow .15s;
+    }
+
+    .input-wrap:focus-within {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(0,128,96,.1);
+    }
+
+    .input-prefix, .input-suffix {
+      padding: 0 10px;
+      background: var(--grey-50);
+      color: var(--grey-500);
+      font-size: 13px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .input-prefix { border-right: 1px solid var(--grey-100); }
+    .input-suffix { border-left: 1px solid var(--grey-100); }
+
+    .input-wrap input {
+      flex: 1;
+      border: none;
+      outline: none;
+      padding: 0 12px;
+      height: 40px;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--grey-900);
+      background: transparent;
+      min-width: 0;
+    }
+
+    /* ── Advanced settings ──────────────────────────────── */
+    .advanced-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 16px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--grey-500);
+      padding: 0;
+      transition: color .15s;
+    }
+
+    .advanced-toggle:hover { color: var(--green); }
+
+    .advanced-toggle .chevron {
+      width: 16px;
+      height: 16px;
+      transition: transform .2s;
+    }
+
+    .advanced-toggle.open .chevron { transform: rotate(180deg); }
+
+    .advanced-panel {
+      display: none;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--grey-100);
+    }
+
+    .advanced-panel.open { display: block; }
+
+    .adv-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 480px) { .adv-grid { grid-template-columns: 1fr; } }
+
+    .adv-label {
+      font-size: 11px;
+      color: var(--grey-500);
+      margin-bottom: 8px;
+    }
+
+    /* ── Results ─────────────────────────────────────────── */
+    .fee-hero {
+      background: linear-gradient(135deg, var(--green-dark) 0%, #006b4f 100%);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-bottom: 16px;
+      color: white;
+      text-align: center;
+    }
+
+    .fee-hero-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.6);
+      margin-bottom: 6px;
+    }
+
+    .fee-hero-amount {
+      font-size: 48px;
+      font-weight: 800;
+      letter-spacing: -.03em;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .fee-hero-sub {
+      font-size: 13px;
+      color: rgba(255,255,255,.65);
+    }
+
+    .fee-hero-sub.min-applied {
+      background: rgba(255,255,255,.15);
+      border-radius: 20px;
+      padding: 4px 12px;
+      display: inline-block;
+    }
+
+    .channel-results {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .ch-stat {
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+    }
+
+    .ch-stat.dtc-stat { background: var(--blue-light); border: 1px solid #c4d9f5; }
+    .ch-stat.b2b-stat { background: var(--orange-light); border: 1px solid #f5cfb0; }
+
+    .ch-stat .ch-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--grey-500);
+      margin-bottom: 4px;
+    }
+
+    .ch-stat .ch-value { font-size: 22px; font-weight: 700; color: var(--grey-900); }
+    .ch-stat .ch-sub { font-size: 12px; color: var(--grey-500); margin-top: 2px; }
+
+    /* Annual strip */
+    .annual-strip {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .ann-stat {
+      background: var(--grey-50);
+      border: 1px solid var(--grey-100);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+    }
+
+    .ann-stat .ann-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--grey-500); margin-bottom: 4px; }
+    .ann-stat .ann-value { font-size: 15px; font-weight: 700; color: var(--grey-900); font-family: monospace; }
+
+    /* Breakdown */
+    .breakdown-wrap {
+      border: 1px solid var(--grey-100);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+
+    .breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--grey-100);
+    }
+
+    .breakdown-row:last-child { border-bottom: none; }
+    .breakdown-row.section-head { background: var(--grey-50); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--grey-500); }
+    .breakdown-row.dtc-row { background: #f0f5fc; }
+    .breakdown-row.b2b-row { background: #fdf5f0; }
+    .breakdown-row .label { color: var(--grey-700); }
+    .breakdown-row .amount { font-weight: 700; font-family: monospace; font-size: 13px; color: var(--grey-900); }
+    .breakdown-row.total-row { background: var(--green-dark); color: white; font-weight: 700; font-size: 14px; }
+    .breakdown-row.total-row .amount { color: white; }
+
+    .pill {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 3px;
+      margin-right: 5px;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+    }
+
+    .pill-dtc { background: var(--blue); color: white; }
+    .pill-b2b { background: var(--orange); color: white; }
+    .pill-check { background: var(--green); color: white; }
+    .pill-dim { background: var(--grey-200); color: var(--grey-700); }
+
+    /* ── Comparison section ─────────────────────────────── */
+    .comparison-wrap { margin-top: 20px; }
+
+    .cmp-intro {
+      display: flex;
+      align-items: flex-end;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .cmp-intro .input-group { flex: 0 0 220px; margin-bottom: 0; }
+
+    .cmp-intro-text {
+      font-size: 13px;
+      color: var(--grey-500);
+      line-height: 1.5;
+      flex: 1;
+      min-width: 180px;
+      padding-bottom: 2px;
+    }
+
+    .cmp-grid {
+      display: grid;
+      grid-template-columns: 180px 1fr 1fr;
+      border: 1px solid var(--grey-100);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      font-size: 13px;
+    }
+
+    .cmp-cell {
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--grey-100);
+      border-right: 1px solid var(--grey-100);
+      display: flex;
+      align-items: center;
+    }
+
+    .cmp-cell:last-child, .cmp-cell:nth-child(3n) { border-right: none; }
+
+    .cmp-cell.header {
+      background: var(--grey-50);
+      font-weight: 700;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--grey-500);
+      justify-content: center;
+      text-align: center;
+    }
+
+    .cmp-cell.row-label { color: var(--grey-700); font-weight: 500; font-size: 13px; }
+    .cmp-cell.value { font-family: monospace; font-weight: 700; justify-content: flex-end; font-size: 13px; }
+    .cmp-cell.variable-col { background: #f0f5fc; }
+    .cmp-cell.fixed-col    { background: #fdf5f0; }
+    .cmp-cell.total-row { font-weight: 800; font-size: 15px; }
+    .cmp-cell.total-row.variable-col { background: var(--blue-light); color: var(--blue); }
+    .cmp-cell.total-row.fixed-col    { background: var(--orange-light); color: var(--orange); }
+    .cmp-cell.winner-col { outline: 2px solid var(--green); outline-offset: -2px; }
+    .cmp-cell.savings-row { background: var(--green-light); font-weight: 700; color: var(--green-dark); }
+    .cmp-cell.savings-row.negative { background: #ffeaea; color: #c0392b; }
+    .cmp-cell.same-row { color: var(--grey-500); font-style: italic; justify-content: flex-end; font-size: 12px; }
+
+    .savings-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-left: 6px;
+    }
+
+    .badge-cheaper { background: var(--green); color: white; }
+    .badge-equal   { background: var(--grey-200); color: var(--grey-700); }
+
+    /* ── Footer ─────────────────────────────────────────── */
+    .site-footer {
+      background: var(--grey-900);
+      padding: 36px 24px;
+      text-align: center;
+      margin-top: 60px;
+    }
+
+    .site-footer p {
+      font-size: 12px;
+      color: rgba(255,255,255,.4);
+      line-height: 1.7;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    .site-footer strong { color: rgba(255,255,255,.65); }
+
+    /* ── Print button ───────────────────────────────────────── */
+    .btn-print {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: var(--radius-sm);
+      color: white;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background .15s, border-color .15s;
+      white-space: nowrap;
+    }
+
+    .btn-print:hover {
+      background: rgba(255,255,255,.22);
+      border-color: rgba(255,255,255,.4);
+    }
+
+    .btn-print svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+    /* ── Misc ─────────────────────────────────────────────── */
+    .divider { border: none; border-top: 1px solid var(--grey-100); margin: 0; }
+
+    /* ── Print / PDF styles ─────────────────────────────────── */
+    @media print {
+      @page { margin: 14mm 14mm 14mm 14mm; size: A4; }
+
+      body { background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+      .site-nav { position: static; background: var(--green-dark) !important; padding: 10px 16px; }
+      .btn-print { display: none !important; }
+
+      .hero { padding: 24px 16px 20px; }
+      .hero h1 { font-size: 26px; }
+      .hero p { font-size: 14px; }
+
+      .page-wrap { padding: 16px 0 20px; max-width: 100%; }
+
+      .two-col { grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px !important; }
+
+      .card { box-shadow: none; border: 1px solid var(--grey-200); padding: 16px; }
+
+      /* hide interactive controls */
+      .period-toggle,
+      .advanced-toggle,
+      .advanced-panel { display: none !important; }
+
+      /* show all channel inputs flat */
+      .channel-block { padding: 10px 12px; margin-bottom: 8px; }
+      .input-wrap { border: 1px solid var(--grey-200); }
+      .input-wrap input { font-size: 13px; height: 32px; }
+      .input-prefix, .input-suffix { height: 32px; font-size: 12px; }
+
+      .fee-hero { padding: 16px; border-radius: 6px; }
+      .fee-hero-amount { font-size: 36px; }
+
+      .channel-results { gap: 8px; margin-bottom: 10px; }
+      .annual-strip { gap: 8px; margin-bottom: 10px; }
+
+      .comparison-wrap { margin-top: 12px; }
+      .cmp-intro { margin-bottom: 12px; }
+      .cmp-intro .input-group { flex: 0 0 180px; }
+
+      .site-footer { margin-top: 20px; padding: 16px; }
+
+      /* force page breaks to avoid cutting across sections */
+      .comparison-wrap { page-break-inside: avoid; }
+      .fee-hero { page-break-inside: avoid; }
+      .breakdown-wrap { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="site-nav">
+  <a class="nav-logo" href="#">
+    <div class="nav-logo-mark">
+      <svg viewBox="0 0 20 20"><path d="M13.2 2.1c-.1-.1-.3-.1-.4 0l-1 .6c-.2-.5-.6-1-1.1-1.3-.8-.5-1.8-.4-2.5.2-.5.4-.8 1-.8 1.6H6c-.6 0-1 .4-1 1v11c0 .6.4 1 1 1h8c.6 0 1-.4 1-1V3.1c0-.4-.3-.8-.8-1zm-3.1-.1c.3 0 .6.1.8.3.3.2.4.5.5.8l-2.5 1.6c0-.2.1-.4.2-.6.3-.6.8-1 1-.1.2-.1z"/></svg>
+    </div>
+    <span class="nav-logo-text">Shopify</span>
+  </a>
+  <div class="nav-divider"></div>
+  <span class="nav-subtitle">Platform Fee Estimator</span>
+  <button class="btn-print" onclick="window.print()">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 7V3h10v4M5 15H3a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-2"/>
+      <rect x="5" y="12" width="10" height="6" rx="1"/>
+      <circle cx="15.5" cy="9.5" r=".5" fill="currentColor"/>
+    </svg>
+    Save as PDF
+  </button>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <span class="hero-eyebrow">Commerce Platform Pricing</span>
+  <h1>Estimate your platform fees</h1>
+  <p>Enter your sales volume below to see your estimated monthly and annual platform costs based on your DTC and B2B channels.</p>
+</div>
+
+<!-- Main content -->
+<div class="page-wrap">
+
+  <div class="two-col" style="margin-bottom: 20px;">
+
+    <!-- Left: Inputs -->
+    <div>
+      <div class="section-label">Your Sales Volume</div>
+      <div class="card">
+        <p class="card-title">Enter your GMV</p>
+        <p class="card-desc">Your Gross Merchandise Volume (GMV) is the total value of orders processed through your store.</p>
+
+        <div class="period-toggle">
+          <button id="btn-monthly" class="active" onclick="setMode('monthly')">Monthly</button>
+          <button id="btn-annual" onclick="setMode('annual')">Annual</button>
+        </div>
+
+        <!-- DTC -->
+        <div class="channel-block dtc">
+          <div class="channel-header">
+            <div class="channel-name-group">
+              <span class="channel-badge">DTC</span>
+              <span class="channel-name">Direct to Consumer</span>
+            </div>
+            <span class="rate-chip" id="dtc-rate-chip">0.35% fee</span>
+          </div>
+          <div class="input-group">
+            <label id="dtc-gmv-label">Monthly sales volume</label>
+            <div class="input-wrap">
+              <span class="input-prefix">$</span>
+              <input type="text" id="dtc-gmv" value="5,000,000" oninput="onChannelInput(this)" />
+            </div>
+          </div>
+        </div>
+
+        <!-- B2B -->
+        <div class="channel-block b2b">
+          <div class="channel-header">
+            <div class="channel-name-group">
+              <span class="channel-badge">B2B</span>
+              <span class="channel-name">Business to Business</span>
+            </div>
+            <span class="rate-chip" id="b2b-rate-chip">0.18% fee</span>
+          </div>
+          <div class="input-group">
+            <label id="b2b-gmv-label">Monthly sales volume</label>
+            <div class="input-wrap">
+              <span class="input-prefix">$</span>
+              <input type="text" id="b2b-gmv" value="2,000,000" oninput="onChannelInput(this)" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Advanced toggle -->
+        <button class="advanced-toggle" id="adv-toggle" onclick="toggleAdvanced()">
+          <svg class="chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 8l5 5 5-5"/></svg>
+          Advanced settings
+        </button>
+
+        <div class="advanced-panel" id="adv-panel">
+          <p class="adv-label">Adjust rates and minimum fee. These defaults reflect standard Shopify Commerce pricing.</p>
+          <div class="adv-grid">
+            <div class="input-group">
+              <label>DTC rate (%)</label>
+              <div class="input-wrap">
+                <input type="text" id="dtc-rate" value="0.35" oninput="onRateInput()" style="text-align:right;" />
+                <span class="input-suffix">%</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label>B2B rate (%)</label>
+              <div class="input-wrap">
+                <input type="text" id="b2b-rate" value="0.18" oninput="onRateInput()" style="text-align:right;" />
+                <span class="input-suffix">%</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label>Minimum monthly fee</label>
+              <div class="input-wrap">
+                <span class="input-prefix">$</span>
+                <input type="text" id="min-platform-fee" value="2,300" oninput="calculate()" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Results -->
+    <div>
+      <div class="section-label">Your Estimated Fees</div>
+      <div class="card" style="padding: 0; overflow: hidden;">
+
+        <div class="fee-hero">
+          <div class="fee-hero-label">Estimated Monthly Fee</div>
+          <div class="fee-hero-amount" id="res-combined">—</div>
+          <div class="fee-hero-sub" id="res-combined-sub">—</div>
+        </div>
+
+        <div style="padding: 0 20px 20px;">
+
+          <div class="channel-results">
+            <div class="ch-stat dtc-stat">
+              <div class="ch-label">DTC Fee</div>
+              <div class="ch-value" id="res-dtc-fee">—</div>
+              <div class="ch-sub" id="res-dtc-sub">—</div>
+            </div>
+            <div class="ch-stat b2b-stat">
+              <div class="ch-label">B2B Fee</div>
+              <div class="ch-value" id="res-b2b-fee">—</div>
+              <div class="ch-sub" id="res-b2b-sub">—</div>
+            </div>
+          </div>
+
+          <div class="annual-strip">
+            <div class="ann-stat">
+              <div class="ann-label">Annual DTC</div>
+              <div class="ann-value" id="res-dtc-annual">—</div>
+            </div>
+            <div class="ann-stat">
+              <div class="ann-label">Annual B2B</div>
+              <div class="ann-value" id="res-b2b-annual">—</div>
+            </div>
+            <div class="ann-stat">
+              <div class="ann-label">Annual Total</div>
+              <div class="ann-value" id="res-annual-combined">—</div>
+            </div>
+          </div>
+
+          <div class="breakdown-wrap" id="breakdown"></div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Comparison section -->
+  <div class="section-label" style="margin-top: 8px;">Compare B2B Pricing Options</div>
+  <div class="card comparison-wrap">
+    <p class="card-title">Variable vs. Fixed B2B Fee</p>
+    <p class="card-desc">See how a fixed monthly B2B fee compares to the variable rate as your sales volume changes. Adjust the fixed fee to match a quoted amount.</p>
+
+    <div class="cmp-intro">
+      <div class="input-group">
+        <label>Fixed B2B monthly fee</label>
+        <div class="input-wrap">
+          <span class="input-prefix">$</span>
+          <input type="text" id="cmp-fixed-b2b" value="5,000" oninput="calculate()" />
+        </div>
+      </div>
+      <div class="cmp-intro-text">
+        Your DTC fee and minimum floor apply equally to both options — only the B2B pricing method changes. Adjust your GMV above to see where each option becomes more cost-effective.
+      </div>
+    </div>
+
+    <div class="cmp-grid" id="cmp-grid"></div>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <p>
+    <strong>Estimates only.</strong> Fees shown are illustrative and based on standard Variable Platform Fee (VPF) rates. Your actual fees may vary depending on your specific contract, negotiated rates, and applicable minimums. Contact your Shopify account team for your exact pricing.
+  </p>
+</footer>
+
+<script>
+  // ── State ───────────────────────────────────────────────
+  let mode = 'monthly';
+
+  // ── Helpers ─────────────────────────────────────────────
+  const fmt = (n, d = 0) =>
+    n.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: d, maximumFractionDigits: d });
+
+  const fmtPct = (n) => n.toFixed(4).replace(/\.?0+$/, '') + '%';
+
+  function parseNumber(str) {
+    return parseFloat(String(str).replace(/[^0-9.]/g, '')) || 0;
+  }
+
+  function getChannelGmv(id) {
+    const raw = parseNumber(document.getElementById(id).value);
+    return mode === 'annual' ? raw / 12 : raw;
+  }
+
+  // ── Advanced toggle ──────────────────────────────────────
+  function toggleAdvanced() {
+    const btn = document.getElementById('adv-toggle');
+    const panel = document.getElementById('adv-panel');
+    btn.classList.toggle('open');
+    panel.classList.toggle('open');
+  }
+
+  // ── Rate chip sync ───────────────────────────────────────
+  function onRateInput() {
+    const dtcRate = parseFloat(document.getElementById('dtc-rate').value) || 0;
+    const b2bRate = parseFloat(document.getElementById('b2b-rate').value) || 0;
+    document.getElementById('dtc-rate-chip').textContent = `${fmtPct(dtcRate)} fee`;
+    document.getElementById('b2b-rate-chip').textContent = `${fmtPct(b2bRate)} fee`;
+    calculate();
+  }
+
+  // ── Mode switching ───────────────────────────────────────
+  function setMode(m) {
+    mode = m;
+    document.getElementById('btn-monthly').classList.toggle('active', m === 'monthly');
+    document.getElementById('btn-annual').classList.toggle('active', m === 'annual');
+    const label = m === 'monthly' ? 'Monthly sales volume' : 'Annual sales volume';
+    document.getElementById('dtc-gmv-label').textContent = label;
+    document.getElementById('b2b-gmv-label').textContent = label;
+    calculate();
+  }
+
+  // ── GMV input formatting ─────────────────────────────────
+  function onChannelInput(el) {
+    const raw = parseNumber(el.value);
+    const pos = el.selectionStart;
+    el.value = raw ? raw.toLocaleString('en-US') : '';
+    try { el.setSelectionRange(pos, pos); } catch(e) {}
+    calculate();
+  }
+
+  // ── Core calculation ─────────────────────────────────────
+  function calculate() {
+    const dtcGmv = getChannelGmv('dtc-gmv');
+    const b2bGmv = getChannelGmv('b2b-gmv');
+    const totalGmv = dtcGmv + b2bGmv;
+
+    const dtcRate = parseFloat(document.getElementById('dtc-rate').value) || 0;
+    const b2bRate = parseFloat(document.getElementById('b2b-rate').value) || 0;
+    const minFee  = parseNumber(document.getElementById('min-platform-fee').value);
+
+    const dtcFee     = dtcGmv * (dtcRate / 100);
+    const b2bFee     = b2bGmv * (b2bRate / 100);
+    const vpfTotal   = dtcFee + b2bFee;
+    const monthlyFee = Math.max(minFee, vpfTotal);
+    const minApplied = monthlyFee === minFee && minFee > vpfTotal;
+    const effectiveRate = totalGmv > 0 ? (monthlyFee / totalGmv) * 100 : 0;
+
+    // Hero fee
+    document.getElementById('res-combined').textContent = fmt(monthlyFee);
+    const subEl = document.getElementById('res-combined-sub');
+    if (minApplied) {
+      subEl.textContent = `Minimum fee applies — VPF total is ${fmt(vpfTotal)}`;
+      subEl.className = 'fee-hero-sub min-applied';
+    } else {
+      subEl.textContent = `${fmtPct(effectiveRate)} effective rate on ${fmt(totalGmv)} total GMV`;
+      subEl.className = 'fee-hero-sub';
+    }
+
+    // Channel stats
+    document.getElementById('res-dtc-fee').textContent = fmt(dtcFee);
+    document.getElementById('res-dtc-sub').textContent = `${fmtPct(dtcRate)} of ${fmt(dtcGmv)}`;
+    document.getElementById('res-b2b-fee').textContent = fmt(b2bFee);
+    document.getElementById('res-b2b-sub').textContent = `${fmtPct(b2bRate)} of ${fmt(b2bGmv)}`;
+
+    // Annual
+    document.getElementById('res-dtc-annual').textContent = fmt(dtcFee * 12);
+    document.getElementById('res-b2b-annual').textContent = fmt(b2bFee * 12);
+    document.getElementById('res-annual-combined').textContent = fmt(monthlyFee * 12);
+
+    renderBreakdown(dtcGmv, b2bGmv, dtcFee, b2bFee, vpfTotal, minFee, monthlyFee, minApplied);
+    renderComparison(dtcFee, b2bFee, b2bGmv, b2bRate, minFee, monthlyFee);
+  }
+
+  function renderBreakdown(dtcGmv, b2bGmv, dtcFee, b2bFee, vpfTotal, minFee, monthlyFee, minApplied) {
+    const vpfWins = !minApplied;
+    let html = '';
+
+    html += `<div class="breakdown-row section-head"><span class="label">Fee Calculation</span><span></span></div>`;
+
+    html += `<div class="breakdown-row dtc-row">
+      <span class="label"><span class="pill pill-dtc">DTC</span>${fmt(dtcGmv)} × ${fmtPct(parseFloat(document.getElementById('dtc-rate').value)||0)}</span>
+      <span class="amount">${fmt(dtcFee)}</span>
+    </div>`;
+
+    html += `<div class="breakdown-row b2b-row">
+      <span class="label"><span class="pill pill-b2b">B2B</span>${fmt(b2bGmv)} × ${fmtPct(parseFloat(document.getElementById('b2b-rate').value)||0)}</span>
+      <span class="amount">${fmt(b2bFee)}</span>
+    </div>`;
+
+    html += `<div class="breakdown-row" style="font-weight:600;background:var(--grey-50);">
+      <span class="label">Combined VPF subtotal</span>
+      <span class="amount">${fmt(vpfTotal)}</span>
+    </div>`;
+
+    html += `<div class="breakdown-row section-head"><span class="label">Greater Of</span><span></span></div>`;
+
+    html += `<div class="breakdown-row" style="background:${vpfWins ? 'var(--green-light)' : 'var(--grey-50)'};">
+      <span class="label">
+        <span class="pill ${vpfWins ? 'pill-check' : 'pill-dim'}">${vpfWins ? '✓' : ''}</span>
+        Combined DTC + B2B fee
+      </span>
+      <span class="amount">${fmt(vpfTotal)}</span>
+    </div>`;
+
+    html += `<div class="breakdown-row" style="background:${minApplied ? 'var(--green-light)' : 'var(--grey-50)'};">
+      <span class="label">
+        <span class="pill ${minApplied ? 'pill-check' : 'pill-dim'}">${minApplied ? '✓' : ''}</span>
+        Minimum monthly fee
+      </span>
+      <span class="amount">${fmt(minFee)}</span>
+    </div>`;
+
+    html += `<div class="breakdown-row total-row">
+      <span class="label">Monthly fee charged</span>
+      <span class="amount">${fmt(monthlyFee)}</span>
+    </div>`;
+
+    document.getElementById('breakdown').innerHTML = html;
+  }
+
+  function renderComparison(dtcFee, variableB2bFee, b2bGmv, b2bRate, minFee, variableTotal) {
+    const fixedB2bFee = parseNumber(document.getElementById('cmp-fixed-b2b').value);
+    const fixedTotal  = Math.max(minFee, dtcFee) + fixedB2bFee;
+    const variableWins = variableTotal <= fixedTotal;
+    const equalish     = Math.abs(fixedTotal - variableTotal) < 0.01;
+
+    function cell(content, cls = '') {
+      return `<div class="cmp-cell ${cls}">${content}</div>`;
+    }
+
+    function moneyCell(n, colCls, extraCls = '') {
+      return cell(`<span style="font-family:monospace;">${fmt(n)}</span>`, `value ${colCls} ${extraCls}`);
+    }
+
+    let html = '';
+
+    html += cell('', 'header');
+    html += cell(`<strong style="display:block;margin-bottom:3px;">Variable B2B</strong><span style="font-weight:400;">${fmtPct(b2bRate)} of B2B sales</span>`, `header variable-col${variableWins && !equalish ? ' winner-col' : ''}`);
+    html += cell(`<strong style="display:block;margin-bottom:3px;">Fixed B2B</strong><span style="font-weight:400;">Locked monthly fee</span>`, `header fixed-col${!variableWins && !equalish ? ' winner-col' : ''}`);
+
+    html += cell('DTC fee', 'row-label');
+    html += cell(fmt(dtcFee), 'value variable-col same-row');
+    html += cell(fmt(dtcFee), 'value fixed-col same-row');
+
+    html += cell('B2B fee', 'row-label');
+    html += moneyCell(variableB2bFee, 'variable-col');
+    html += moneyCell(fixedB2bFee, 'fixed-col');
+
+    html += cell('Minimum floor', 'row-label');
+    html += cell(fmt(minFee), 'value variable-col same-row');
+    html += cell(fmt(minFee), 'value fixed-col same-row');
+
+    html += cell('Monthly total', 'row-label total-row');
+    html += moneyCell(variableTotal, 'variable-col', 'total-row');
+    html += moneyCell(fixedTotal, 'fixed-col', 'total-row');
+
+    html += cell('Annual total', 'row-label');
+    html += cell(fmt(variableTotal * 12), 'value variable-col');
+    html += cell(fmt(fixedTotal * 12), 'value fixed-col');
+
+    if (equalish) {
+      html += cell('Difference', 'row-label savings-row');
+      html += cell(`No difference <span class="savings-badge badge-equal">Equal</span>`, 'savings-row');
+      html += cell('', 'savings-row');
+    } else if (variableWins) {
+      const s = fixedTotal - variableTotal;
+      html += cell('Variable saves', 'row-label savings-row');
+      html += cell(`${fmt(s)}/mo · ${fmt(s * 12)}/yr <span class="savings-badge badge-cheaper">Cheaper</span>`, 'savings-row winner-col');
+      html += cell(`+${fmt(s)}/mo more`, 'savings-row negative');
+    } else {
+      const s = variableTotal - fixedTotal;
+      html += cell('Fixed saves', 'row-label savings-row negative');
+      html += cell(`+${fmt(s)}/mo more`, 'savings-row negative');
+      html += cell(`${fmt(s)}/mo · ${fmt(s * 12)}/yr <span class="savings-badge badge-cheaper">Cheaper</span>`, 'savings-row winner-col');
+    }
+
+    document.getElementById('cmp-grid').innerHTML = html;
+  }
+
+  // ── Init ─────────────────────────────────────────────────
+  calculate();
+</script>
+
+</body>
+</html>
