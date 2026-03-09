@@ -577,6 +577,188 @@
 
     .site-footer strong { color: rgba(255,255,255,.65); }
 
+    /* ── Scenario slots ─────────────────────────────────────── */
+    .scenario-slots-section { margin-bottom: 20px; }
+
+    .scenario-slots-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .scenario-bar {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 600px) { .scenario-bar { grid-template-columns: 1fr; } }
+
+    .scenario-slot {
+      background: white;
+      border: 1.5px dashed var(--grey-200);
+      border-radius: var(--radius);
+      padding: 18px 16px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      transition: border-color .15s;
+    }
+
+    .scenario-slot.saved { border-style: solid; border-color: var(--grey-100); }
+
+    .scenario-slot-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--grey-100);
+      color: var(--grey-500);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 800;
+      margin: 0 auto 12px;
+      transition: background .15s, color .15s;
+    }
+
+    .scenario-slot.saved .scenario-slot-badge { background: var(--green-dark); color: white; }
+
+    .scenario-slot-empty { font-size: 12px; color: var(--grey-200); margin-bottom: 12px; }
+
+    .scenario-slot-gmv { margin-bottom: 12px; }
+
+    .slot-gmv-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--grey-900);
+      margin-bottom: 4px;
+    }
+
+    .slot-gmv-row small { color: var(--grey-500); font-weight: 400; }
+
+    .slot-ch {
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .05em;
+      padding: 2px 5px;
+      border-radius: 3px;
+      text-transform: uppercase;
+    }
+
+    .dtc-ch { background: var(--blue); color: white; }
+    .b2b-ch { background: var(--orange); color: white; }
+
+    .scenario-slot-actions { display: flex; gap: 6px; justify-content: center; }
+
+    .btn-save-scenario {
+      flex: 1;
+      padding: 7px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--grey-200);
+      background: var(--grey-50);
+      color: var(--grey-700);
+      transition: all .15s;
+    }
+
+    .btn-save-scenario:hover { background: var(--green-light); border-color: var(--green); color: var(--green-dark); }
+
+    .btn-clear-scenario {
+      padding: 7px 9px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      cursor: pointer;
+      border: 1px solid var(--grey-100);
+      background: transparent;
+      color: var(--grey-200);
+      transition: all .15s;
+      line-height: 1;
+    }
+
+    .btn-clear-scenario:hover { background: #ffeaea; border-color: #ffb3b3; color: #c0392b; }
+
+    .btn-compare-scenarios {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: var(--green-dark);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s, opacity .15s;
+      white-space: nowrap;
+    }
+
+    .btn-compare-scenarios:hover:not(:disabled) { background: var(--green); }
+    .btn-compare-scenarios:disabled { opacity: .4; cursor: not-allowed; }
+    .btn-compare-scenarios svg { width: 14px; height: 14px; }
+
+    /* ── Scenario comparison panels ─────────────────────────── */
+    .scenario-cmp-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 760px) { .scenario-cmp-grid { grid-template-columns: 1fr; } }
+
+    .scenario-panel { border: 1px solid var(--grey-100); border-radius: var(--radius-sm); overflow: hidden; }
+    .scenario-panel.empty-panel { opacity: .5; }
+
+    .scenario-panel-head { background: var(--green-dark); color: white; padding: 14px 16px; }
+
+    .spanel-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: rgba(255,255,255,.6);
+      margin-bottom: 4px;
+    }
+
+    .spanel-gmv-line { font-size: 12px; color: rgba(255,255,255,.85); font-weight: 500; }
+
+    .spanel-table { display: grid; grid-template-columns: 1fr 1fr; }
+
+    .spanel-col-head {
+      padding: 8px 12px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      text-align: center;
+      border-bottom: 1px solid var(--grey-100);
+    }
+
+    .spanel-col-head.var-head { background: var(--blue-light); color: var(--blue); border-right: 1px solid var(--grey-100); }
+    .spanel-col-head.fix-head { background: var(--orange-light); color: var(--orange); }
+
+    .spanel-cell { padding: 10px 12px; border-bottom: 1px solid var(--grey-100); }
+    .spanel-cell.var-cell { background: rgba(224,237,252,.25); border-right: 1px solid var(--grey-100); }
+    .spanel-cell.fix-cell { background: rgba(253,240,232,.25); }
+
+    .sc-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--grey-500); margin-bottom: 3px; }
+    .sc-val { font-family: monospace; font-weight: 700; font-size: 14px; color: var(--grey-900); }
+    .spanel-cell.var-cell .sc-val { color: var(--blue); }
+    .spanel-cell.fix-cell .sc-val { color: var(--orange); }
+    .sc-sub { font-size: 11px; color: var(--grey-500); margin-top: 2px; }
+
+    .spanel-footer { padding: 10px 14px; font-size: 12px; font-weight: 700; text-align: center; border-top: 1px solid var(--grey-100); }
+    .spanel-footer.var-wins { background: var(--green-light); color: var(--green-dark); }
+    .spanel-footer.fix-wins { background: var(--orange-light); color: var(--orange); }
+    .spanel-footer.equal { background: var(--grey-50); color: var(--grey-500); font-style: italic; font-weight: 400; }
+
     /* ── Print button ───────────────────────────────────────── */
     .btn-print {
       margin-left: auto;
@@ -820,6 +1002,18 @@
 
   </div>
 
+  <!-- Scenario slots -->
+  <div class="scenario-slots-section">
+    <div class="scenario-slots-header">
+      <span class="section-label" style="margin-bottom:0;">Save GMV Scenarios</span>
+      <button class="btn-compare-scenarios" id="btn-compare" onclick="toggleScenarioCmp()" disabled>
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h14M3 10h14M3 14h14"/></svg>
+        Compare Scenarios
+      </button>
+    </div>
+    <div class="scenario-bar" id="scenario-bar"></div>
+  </div>
+
   <!-- Comparison section -->
   <div class="section-label" style="margin-top: 8px;">Compare B2B Pricing Options</div>
   <div class="card comparison-wrap">
@@ -840,6 +1034,16 @@
     </div>
 
     <div class="cmp-grid" id="cmp-grid"></div>
+  </div>
+
+  <!-- Scenario comparison -->
+  <div id="scenario-cmp-section" style="display:none; margin-top: 20px;">
+    <div class="section-label">GMV Scenario Comparison</div>
+    <div class="card">
+      <p class="card-title">Variable vs. Fixed B2B — Across All Scenarios</p>
+      <p class="card-desc">Each panel shows the full fee breakdown for a saved GMV scenario. Rates and fixed B2B fee are inherited from your settings above.</p>
+      <div class="scenario-cmp-grid" id="scenario-cmp-grid"></div>
+    </div>
   </div>
 
 </div>
@@ -948,6 +1152,7 @@
 
     renderBreakdown(dtcGmv, b2bGmv, dtcFee, b2bFee, vpfTotal, minFee, monthlyFee, minApplied);
     renderComparison(dtcFee, b2bFee, b2bGmv, b2bRate, minFee, monthlyFee);
+    if (scenarioCmpVisible) renderScenarioComparison();
   }
 
   function renderBreakdown(dtcGmv, b2bGmv, dtcFee, b2bFee, vpfTotal, minFee, monthlyFee, minApplied) {
@@ -1056,7 +1261,162 @@
     document.getElementById('cmp-grid').innerHTML = html;
   }
 
+  // ── Scenarios ────────────────────────────────────────────
+  const scenarios = [
+    { id: 'A', saved: false, dtcMonthly: 0, b2bMonthly: 0 },
+    { id: 'B', saved: false, dtcMonthly: 0, b2bMonthly: 0 },
+    { id: 'C', saved: false, dtcMonthly: 0, b2bMonthly: 0 },
+  ];
+
+  let scenarioCmpVisible = false;
+
+  function saveScenario(i) {
+    scenarios[i].dtcMonthly = getChannelGmv('dtc-gmv');
+    scenarios[i].b2bMonthly = getChannelGmv('b2b-gmv');
+    scenarios[i].saved = true;
+    renderScenarioSlots();
+    updateScenarioCmpBtn();
+    if (scenarioCmpVisible) renderScenarioComparison();
+  }
+
+  function clearScenario(i) {
+    scenarios[i].saved = false;
+    scenarios[i].dtcMonthly = 0;
+    scenarios[i].b2bMonthly = 0;
+    renderScenarioSlots();
+    updateScenarioCmpBtn();
+    if (scenarioCmpVisible) renderScenarioComparison();
+  }
+
+  function updateScenarioCmpBtn() {
+    const anySaved = scenarios.some(s => s.saved);
+    document.getElementById('btn-compare').disabled = !anySaved;
+  }
+
+  function toggleScenarioCmp() {
+    scenarioCmpVisible = !scenarioCmpVisible;
+    const section = document.getElementById('scenario-cmp-section');
+    section.style.display = scenarioCmpVisible ? 'block' : 'none';
+    const btn = document.getElementById('btn-compare');
+    btn.querySelector('svg').innerHTML = scenarioCmpVisible
+      ? '<path d="M5 10h10M10 5l5 5-5 5"/>'
+      : '<path d="M3 6h14M3 10h14M3 14h14"/>';
+    btn.lastChild.textContent = scenarioCmpVisible ? ' Hide Comparison' : ' Compare Scenarios';
+    if (scenarioCmpVisible) {
+      renderScenarioComparison();
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function calcScenarioFees(s) {
+    const dtcRate   = parseFloat(document.getElementById('dtc-rate').value) || 0;
+    const b2bRate   = parseFloat(document.getElementById('b2b-rate').value) || 0;
+    const minFee    = parseNumber(document.getElementById('min-platform-fee').value);
+    const fixedB2b  = parseNumber(document.getElementById('cmp-fixed-b2b').value);
+    const dtcFee    = s.dtcMonthly * (dtcRate / 100);
+    const b2bVarFee = s.b2bMonthly * (b2bRate / 100);
+    const varMonthly   = Math.max(minFee, dtcFee + b2bVarFee);
+    const fixedMonthly = Math.max(minFee, dtcFee) + fixedB2b;
+    return { dtcFee, b2bVarFee, fixedB2b, varMonthly, varAnnual: varMonthly * 12, fixedMonthly, fixedAnnual: fixedMonthly * 12 };
+  }
+
+  function renderScenarioSlots() {
+    let html = '';
+    scenarios.forEach((s, i) => {
+      html += `<div class="scenario-slot${s.saved ? ' saved' : ''}">
+        <div class="scenario-slot-badge">${s.id}</div>
+        ${s.saved
+          ? `<div class="scenario-slot-gmv">
+               <div class="slot-gmv-row"><span class="slot-ch dtc-ch">DTC</span>${fmt(s.dtcMonthly)}<small>/mo</small></div>
+               <div class="slot-gmv-row"><span class="slot-ch b2b-ch">B2B</span>${fmt(s.b2bMonthly)}<small>/mo</small></div>
+             </div>`
+          : `<div class="scenario-slot-empty">No data saved</div>`
+        }
+        <div class="scenario-slot-actions">
+          <button class="btn-save-scenario" onclick="saveScenario(${i})">${s.saved ? 'Update' : 'Save current'}</button>
+          ${s.saved ? `<button class="btn-clear-scenario" onclick="clearScenario(${i})" title="Clear">✕</button>` : ''}
+        </div>
+      </div>`;
+    });
+    document.getElementById('scenario-bar').innerHTML = html;
+  }
+
+  function renderScenarioComparison() {
+    let html = '';
+    scenarios.forEach(s => {
+      if (!s.saved) {
+        html += `<div class="scenario-panel empty-panel">
+          <div class="scenario-panel-head">
+            <div class="spanel-label">Scenario ${s.id}</div>
+            <div class="spanel-gmv-line" style="color:rgba(255,255,255,.4);">Not saved</div>
+          </div>
+          <div style="padding:32px 16px;text-align:center;color:var(--grey-300);font-size:13px;">Save a GMV scenario to compare</div>
+        </div>`;
+        return;
+      }
+      const c = calcScenarioFees(s);
+      const diff = Math.abs(c.varAnnual - c.fixedAnnual);
+      const equalish = diff < 0.01;
+      const varWins = c.varMonthly <= c.fixedMonthly;
+
+      let footer;
+      if (equalish) {
+        footer = `<div class="spanel-footer equal">Equal cost</div>`;
+      } else if (varWins) {
+        footer = `<div class="spanel-footer var-wins">Variable saves ${fmt(diff)}/yr</div>`;
+      } else {
+        footer = `<div class="spanel-footer fix-wins">Fixed saves ${fmt(diff)}/yr</div>`;
+      }
+
+      html += `<div class="scenario-panel">
+        <div class="scenario-panel-head">
+          <div class="spanel-label">Scenario ${s.id}</div>
+          <div class="spanel-gmv-line">DTC ${fmt(s.dtcMonthly * 12)}/yr · B2B ${fmt(s.b2bMonthly * 12)}/yr</div>
+        </div>
+        <div class="spanel-table">
+          <div class="spanel-col-head var-head">Variable B2B</div>
+          <div class="spanel-col-head fix-head">Fixed B2B</div>
+
+          <div class="spanel-cell var-cell">
+            <div class="sc-label">DTC fee</div>
+            <div class="sc-val">${fmt(c.dtcFee)}/mo</div>
+          </div>
+          <div class="spanel-cell fix-cell" style="background:var(--grey-50);">
+            <div class="sc-label">DTC fee</div>
+            <div class="sc-val" style="color:var(--grey-500);">${fmt(c.dtcFee)}/mo</div>
+            <div class="sc-sub">Same</div>
+          </div>
+
+          <div class="spanel-cell var-cell">
+            <div class="sc-label">B2B fee</div>
+            <div class="sc-val">${fmt(c.b2bVarFee)}/mo</div>
+            <div class="sc-sub">Variable rate</div>
+          </div>
+          <div class="spanel-cell fix-cell">
+            <div class="sc-label">B2B fee</div>
+            <div class="sc-val">${fmt(c.fixedB2b)}/mo</div>
+            <div class="sc-sub">Fixed</div>
+          </div>
+
+          <div class="spanel-cell var-cell" style="border-bottom:none;">
+            <div class="sc-label">Monthly total</div>
+            <div class="sc-val" style="font-size:16px;">${fmt(c.varMonthly)}</div>
+            <div class="sc-sub">${fmt(c.varAnnual)}/yr</div>
+          </div>
+          <div class="spanel-cell fix-cell" style="border-bottom:none;">
+            <div class="sc-label">Monthly total</div>
+            <div class="sc-val" style="font-size:16px;">${fmt(c.fixedMonthly)}</div>
+            <div class="sc-sub">${fmt(c.fixedAnnual)}/yr</div>
+          </div>
+        </div>
+        ${footer}
+      </div>`;
+    });
+    document.getElementById('scenario-cmp-grid').innerHTML = html;
+  }
+
   // ── Init ─────────────────────────────────────────────────
+  renderScenarioSlots();
   calculate();
 </script>
 
