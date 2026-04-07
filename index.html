@@ -1093,6 +1093,13 @@
 
   // ── Mode switching ───────────────────────────────────────
   function setMode(m) {
+    if (m === mode) return;
+    const factor = m === 'annual' ? 12 : 1 / 12;
+    ['dtc-gmv', 'b2b-gmv'].forEach(id => {
+      const el = document.getElementById(id);
+      const raw = parseNumber(el.value);
+      if (raw) el.value = Math.round(raw * factor).toLocaleString('en-US');
+    });
     mode = m;
     document.getElementById('btn-monthly').classList.toggle('active', m === 'monthly');
     document.getElementById('btn-annual').classList.toggle('active', m === 'annual');
@@ -1422,3 +1429,4 @@
 
 </body>
 </html>
+
